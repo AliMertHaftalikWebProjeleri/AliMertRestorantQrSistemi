@@ -1,0 +1,51 @@
+@model IEnumerable<AliMertRestoran.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Sepetim";
+}
+
+<h2 class="mb-4 mt-4">Sepetiniz</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Sepetinizde henüz ürün bulunmamaktadır.</div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Menüye Dön</a>
+}
+else
+{
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Ürün</th>
+                    <th>Birim Fiyat</th>
+                    <th>Adet</th>
+                    <th>Toplam</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Product.Name</td>
+                        <td>@item.Product.Price.ToString("C")</td>
+                        <td>@item.Quantity</td>
+                        <td class="fw-bold">@item.TotalPrice.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr class="table-group-divider">
+                    <td colspan="3" class="text-end fw-bold">Genel Toplam:</td>
+                    <td class="fw-bold text-primary">@Model.Sum(x => x.TotalPrice).ToString("C")</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-end mt-4">
+        <form asp-controller="Cart" asp-action="Checkout" method="post">
+            <button type="submit" class="btn btn-success btn-lg px-5">Siparişi Tamamla</button>
+        </form>
+    </div>
+}

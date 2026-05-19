@@ -1,0 +1,82 @@
+@{
+    ViewData["Title"] = "QR Kodlar";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+    <div>
+        <h2 class="fw-bold mb-0">Masa QR Kodları</h2>
+        <p class="text-muted">Müşterilerin masalarından sipariş verebilmesi için bu kodları çıktı alıp masalara yerleştirin.</p>
+    </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-4" id="qrContainer">
+    <!-- QR Kodlar JavaScript ile buraya eklenecek -->
+</div>
+
+@section Scripts {
+    <!-- QR Code JS Kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tableCount = 5; // 5 masa için
+            var container = document.getElementById("qrContainer");
+            
+            // Mevcut sitenin kök URL'si (örneğin: https://localhost:7119)
+            var baseUrl = window.location.origin;
+
+            for (let i = 1; i <= tableCount; i++) {
+                // QR Kod URL'si
+                let tableUrl = baseUrl + "/?tableNumber=" + i;
+
+                // Kart HTML'i oluştur
+                let col = document.createElement("div");
+                col.className = "col";
+                
+                let card = document.createElement("div");
+                card.className = "card shadow-sm border-0 text-center p-4 h-100";
+                
+                let title = document.createElement("h4");
+                title.className = "fw-bold text-primary mb-3";
+                title.innerText = "Masa " + i;
+
+                let qrDiv = document.createElement("div");
+                qrDiv.id = "qrcode-" + i;
+                qrDiv.className = "d-flex justify-content-center mb-3";
+
+                let link = document.createElement("p");
+                link.className = "small text-muted mb-0";
+                link.innerText = tableUrl;
+
+                let printBtn = document.createElement("button");
+                printBtn.className = "btn btn-outline-secondary btn-sm mt-3";
+                printBtn.innerText = "🖨️ Çıktı Al";
+                printBtn.onclick = function() {
+                    let printContents = card.innerHTML;
+                    let originalContents = document.body.innerHTML;
+                    document.body.innerHTML = "<div class='text-center p-5'>" + printContents + "</div>";
+                    window.print();
+                    document.body.innerHTML = originalContents;
+                    location.reload(); // Sayfayı eski haline döndürmek için
+                };
+
+                card.appendChild(title);
+                card.appendChild(qrDiv);
+                card.appendChild(link);
+                card.appendChild(printBtn);
+                col.appendChild(card);
+                container.appendChild(col);
+
+                // QR Kod oluşturucu
+                new QRCode(document.getElementById("qrcode-" + i), {
+                    text: tableUrl,
+                    width: 150,
+                    height: 150,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
+        });
+    </script>
+}

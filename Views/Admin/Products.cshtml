@@ -1,0 +1,71 @@
+@model IEnumerable<AliMertRestoran.Controllers.DailyProductSummary>
+
+@{
+    ViewData["Title"] = "Günlük Özet";
+    Layout = "_AdminLayout";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-4">
+    <div>
+        <h2 class="fw-bold mb-0">Günlük Özet Raporu</h2>
+        <p class="text-muted">Tarih: @ViewBag.TodayDate</p>
+    </div>
+    <div>
+        <a asp-action="ExportToExcel" class="btn btn-success shadow-sm me-2">
+            <i>📊</i> Excel İndir
+        </a>
+        <a asp-action="ExportToPdf" class="btn btn-danger shadow-sm">
+            <i>📄</i> PDF İndir
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-4">Ürün Adı</th>
+                        <th class="text-center">Günlük Satış Adedi</th>
+                        <th class="text-end pe-4">Elde Edilen Gelir</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">
+                                <i>Bugün henüz hiç sipariş alınmamış.</i>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-bold">@item.ProductName</td>
+                                <td class="text-center">
+                                    <span class="badge bg-primary rounded-pill px-3 py-2">@item.TotalQuantity</span>
+                                </td>
+                                <td class="text-end pe-4 text-success fw-bold">@item.TotalRevenue.ToString("C")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+                @if (Model.Any())
+                {
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="2" class="text-end fw-bold ps-4">Genel Toplam:</td>
+                            <td class="text-end pe-4 fw-bold fs-5 text-primary">
+                                @Model.Sum(x => x.TotalRevenue).ToString("C")
+                            </td>
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
+    </div>
+</div>
